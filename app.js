@@ -2,9 +2,6 @@
 var Converter = require("csvtojson").core.Converter;
 var fs = require("fs");
 
-var csvFileName = "./test.csv";
-var fileStream = fs.createReadStream(csvFileName);
-
 //new converter instance 
 var csvConverter = new Converter({constructResult:true});
 
@@ -16,5 +13,32 @@ csvConverter.on("end_parsed",function(jsonObj){
   }); 
 });
 
-//read from file 
-fileStream.pipe(csvConverter);
+//var csvFileDirectory = "Users/angelo/adtile/capture-Pedometer2D/csv/WalkingData/";
+
+var csvFileDirectory = "../../capture-Pedometer2D/csv/WalkingData/";
+
+//var csvFileDirectory = __dirname;
+
+var getAllFiles = function(dir) {
+    var results = [];
+
+    fs.readdirSync(dir).forEach(function(file) {
+
+        file = dir+'/'+file;
+        var stat = fs.statSync(file);
+
+        if (stat && stat.isDirectory()) {
+            results = results.concat(getAllFiles(file))
+        } else results.push(file);
+
+    });
+
+    return results;
+};
+var files = getAllFiles(csvFileDirectory);
+
+files.forEach(function(fileName){
+	var fileStream = fs.createReadStream(csvFileDirectory + fileName);
+	//read from file 
+	fileStream.pipe(csvConverter);
+});
