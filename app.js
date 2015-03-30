@@ -4,20 +4,16 @@ var fs = require("fs");
 
 //new converter instance 
 var csvConverter = new Converter({constructResult:true});
+var csvFileDirectory = "../../capture-Pedometer2D/csv/WalkingData";
+var currentFileName;
 
 //end_parsed will be emitted once parsing finished 
 csvConverter.on("end_parsed",function(jsonObj){
-  fs.writeFile("./test.json", JSON.stringify(jsonObj), function(err) {
+  fs.writeFile(currentFileName, JSON.stringify(jsonObj), function(err) {
     if(err) return console.log(err);
     console.log("The file was saved!");
   }); 
 });
-
-//var csvFileDirectory = "Users/angelo/adtile/capture-Pedometer2D/csv/WalkingData/";
-
-var csvFileDirectory = "../../capture-Pedometer2D/csv/WalkingData/";
-
-//var csvFileDirectory = __dirname;
 
 var getAllFiles = function(dir) {
     var results = [];
@@ -37,8 +33,11 @@ var getAllFiles = function(dir) {
 };
 var files = getAllFiles(csvFileDirectory);
 
+console.log(files);
+
 files.forEach(function(fileName){
-	var fileStream = fs.createReadStream(csvFileDirectory + fileName);
+	currentFileName = fileName;
+	var fileStream = fs.createReadStream(fileName);
 	//read from file 
 	fileStream.pipe(csvConverter);
 });
